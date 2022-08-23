@@ -2,8 +2,6 @@ package com.star.iceserver.websocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.server.WebSession;
-import org.springframework.web.server.session.WebSessionManager;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
@@ -70,7 +68,7 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 
 
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
 		String id = getId(session);
 		logger.warn("{}准备发送消息", id);
 		ConcurrentHashMap<String, WebSocketSession> sessionPool = IceSessionManage.SESSION_POOL;
@@ -86,13 +84,13 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 	}
 
 	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
 
 	}
 
 
 	@Override
-	protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
+	protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
 
 	}
 
