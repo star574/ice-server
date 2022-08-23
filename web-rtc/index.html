@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                width: 100vw;
+                height: 100vh;
+                background-color: rgb(52, 118, 82);
+                background-image: linear-gradient(rgb(42, 133, 127), rgba(26, 159, 144, 0.42), rgb(26, 157, 142));
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+            }
+
+            #display {
+                width: 100%;
+                height: 100%;
+            }
+
+            #display {
+                background-color: rgb(98, 88, 88);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <video id="display" autoplay playsinline></video>
+        </div>
+    </body>
+    <script src="./main.js"></script>
+</html>
