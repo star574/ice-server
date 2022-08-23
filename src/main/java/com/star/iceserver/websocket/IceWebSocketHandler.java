@@ -1,5 +1,7 @@
 package com.star.iceserver.websocket;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.*;
@@ -66,26 +68,25 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 		super.handleTransportError(session, exception);
 	}
 
-
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 		String id = getId(session);
-		logger.warn("{}准备发送消息", id);
+		logger.warn("message:{}",JSON.toJSONString(message.getPayload()));
 		ConcurrentHashMap<String, WebSocketSession> sessionPool = IceSessionManage.SESSION_POOL;
-		sessionPool.remove(id);
 		sessionPool.forEach((K, V) -> {
-			try {
-				V.sendMessage(message);
-				logger.warn("{}已发送", id);
-			} catch (IOException e) {
-				logger.warn("消息转发失败!");
+			if (!K.equals(id)) {
+				try {
+					V.sendMessage(message);
+					logger.warn("{}已发送", id);
+				} catch (IOException e) {
+					logger.warn("消息转发失败!");
+				}
 			}
 		});
 	}
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-
 	}
 
 
