@@ -34,49 +34,4 @@ public class IceSessionManage {
 	public static void delSession(String id) {
 		SESSION_POOL.remove(id);
 	}
-
-	public static void sendTextMessage(String toId, Object content) {
-		WebSocketSession webSocketSession = SESSION_POOL.get(toId);
-		if (webSocketSession != null) {
-			logger.warn("消息发送成功 toId={}", toId);
-			try {
-				webSocketSession.sendMessage(new TextMessage(JSON.toJSONString(content)));
-				return;
-			} catch (IOException e) {
-				logger.warn("消息发送失败 toId={}", toId);
-				throw new RuntimeException(e);
-			}
-		}
-		logger.warn("消息发送失败 toId={} 不存在!", toId);
-	}
-
-	public static void sendBinaryMessage(String toId, byte[] content) {
-		WebSocketSession webSocketSession = SESSION_POOL.get(toId);
-		if (webSocketSession != null) {
-			logger.warn("消息发送成功 toId={}", toId);
-			try {
-				webSocketSession.sendMessage(new BinaryMessage(content));
-				return;
-			} catch (IOException e) {
-				logger.warn("消息发送失败 toId={}", toId);
-				throw new RuntimeException(e);
-			}
-		}
-		logger.warn("消息发送失败 toId={} 不存在!", toId);
-	}
-
-	public static void sendMessage(String toId, WebSocketMessage webSocketMessage) {
-		WebSocketSession webSocketSession = SESSION_POOL.get(toId);
-		if (webSocketSession != null) {
-			logger.warn("消息发送成功 toId={}", toId);
-			try {
-				webSocketSession.sendMessage(webSocketMessage);
-				return;
-			} catch (IOException e) {
-				logger.warn("消息发送失败 toId={}", toId);
-				throw new RuntimeException(e);
-			}
-		}
-		logger.warn("消息发送失败 toId={} 不存在!", toId);
-	}
 }

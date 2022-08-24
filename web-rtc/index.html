@@ -15,22 +15,39 @@
             }
 
             .container {
-                width: 100vw;
-                height: 100vh;
+                width: 100%;
+                height: 80vh;
                 background-color: rgb(52, 118, 82);
                 background-image: linear-gradient(rgb(42, 133, 127), rgba(26, 159, 144, 0.42), rgb(26, 157, 142));
+            }
+
+            #display {
+                width: 30%;
+                height: 20%;
+                background-color: blueviolet;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+            #remote{
+                width: 100%;
+                height: 100%;
+                background-color: bisque;
+            }
+            .btn-container{
+                width: 100%;
                 display: flex;
-                justify-content: space-around;
                 align-items: center;
+                justify-content: space-around;
+                margin-top: 80px;
             }
-
-            #display {
-                width: 80%;
-                height: 80%;
-            }
-
-            #display {
-                background-color: rgb(98, 88, 88);
+            #btn{
+                width: 200px;
+                height: 50px;
+                border: 0;
+                border-radius: 10px;
+                background-color: rgb(25, 53, 130);
+                color: aliceblue;
             }
         </style>
     </head>
@@ -38,8 +55,12 @@
     <body>
         <div class="container">
             <video id="display" autoplay playsinline></video>
+            <video id="remote" autoplay playsinline></video>
+        </div>
+        <div class="btn-container">
             <button id="btn" type="button">链接</button>
         </div>
     </body>
     <script src="./main.js"></script>
+
 </html>

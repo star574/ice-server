@@ -1,111 +1,94 @@
+// element
 let display = document.getElementById("display")
+let remote = document.getElementById("remote")
 let btn = document.getElementById("btn")
-const mediaDevices = navigator.mediaDevices
-var webSocket = null;
-const peerConfig = {
-    'iceServers': [
-        { 'urls': 'localhost:8080/websocket' }
-    ]
-}
-let rtc1 = new RTCPeerConnection()
-let rtc2 = new RTCPeerConnection()
+let ws = false
+let localStream
 
-btn.onclick = function () {
-    console.log("链接");
-    mediaDevices.getDisplayMedia({ video: { frameRate: 75, height: 1080, width: 1920 }, audio: false }).then(localStream => {
-        // if ("srcObject" in display) {
-        //     display.srcObject = localStream
-        // } else {
-        //     display.src = window.URL.createObjectURL(localStream)
-        // }
-        localStream.getTracks().forEach(track => {
-            rtc1.addTrack(track, localStream)
-        })
-        // 进行webrtc链接
-        rtc1.createOffer().then(
-            offer => {
-                rtc1.setLocalDescription(offer)
-                console.log("发送offer");
-                sendMessage({ "offer": offer })
-            }
-        )
-    }
-    )
-}
-rtc2.addEventListener('connectionstatechange', event => {
-    if (rtc2.connectionState == 'connected') {
+
+// webrtc
+let rtc = new RTCPeerConnection()
+navigator.mediaDevices.getDisplayMedia({ video: { width: 1920, height: 1080, frameRate: 75 }, audio: false }).then(stream => {
+    display.srcObject = stream
+    localStream = stream
+    localStream.getTracks().forEach(track => {
+        rtc.addTrack(track, localStream)
+    })
+})
+
+// websocket
+let uid = Math.floor(Math.random() * 1000) + 1
+let websocket = new WebSocket("ws://localhost:8080/websocket", [`${uid}-654321`])
+btn.onclick = getConnect
+// Listen for connectionstatechange on the local RTCPeerConnection
+rtc.addEventListener('connectionstatechange', event => {
+    if (rtc.connectionState === 'connected') {
         // Peers connected!
-        console.log("Peers链接成功");
+        console.log("链接成功！");
     }
 });
-rtc1.addEventListener('connectionstatechange', event => {
-    if (rtc1.connectionState == 'connected') {
-        // Peers connected!
-        console.log("Peers链接成功");
+rtc.addEventListener("icecandidate", event => {
+    if (event.candidate) {
+        sendMessage({ 'icecandidate': event.candidate });
     }
-});
-rtc2.addEventListener('track', async (event) => {
-    console.log(event);
-    const remoteSteam = event.streams[0];
-    console.log("收到远程流", remoteSteam);
-    if ("srcObject" in display) {
-        display.srcObject = remoteSteam
-    } else {
-        display.src = window.URL.createObjectURL(remoteSteam)
-    }
+})
+rtc.addEventListener('track', async (event) => {
+    const [remoteStream] = event.streams;
+    remote.srcObject = remoteStream;
 });
 
+async function getConnect() {
+    if (!ws) {
+        return
+    }
+    let offer = await rtc.createOffer()
+    rtc.setLocalDescription(offer)
+    sendMessage({ "offer": offer })
+}
 
-let uid = Math.floor(Math.random() * 10 + 1)
-webSocket = new WebSocket("ws://localhost:8080/websocket", [`${uid}-654321`])
-webSocket.onopen = onopen
-webSocket.onclose = onclose
-webSocket.onerror = onerror
-webSocket.onmessage = onmessage
 
-async function onopen(e) {
-    console.log("ws连接成功!");
+websocket.onopen = open
+websocket.onerror = error
+websocket.onclose = close
+websocket.onmessage = message
+async function open(event) {
+    console.log(`${uid}：链接成功`);
+    ws = true
 }
-function onclose(e) {
-    console.log("ws连接关闭!");
+async function error(event) {
+    console.log(`${uid}：error`);
 }
-function onerror(e) {
-    console.log("ws连接错误!");
+async function close(event) {
+    console.log(`${uid}：close`);
 }
-async function onmessage(e) {
-    let data = JSON.parse(e.data)
+async function message(event) {
+    let data = JSON.parse(event.data)
     if (data.offer) {
-        console.log("收到offer 设置远程描述，设置答案(answer)", data.offer);
-        await rtc2.setRemoteDescription(new RTCSessionDescription(data.offer));
-        const answer = await rtc2.createAnswer()
-        await rtc2.setLocalDescription(answer)
-        sendMessage({ 'answer': answer })
+        console.log("接收到offer", data.offer);
+        if (!window.confirm("接收会话？")) {
+            return
+        }
+        rtc.setRemoteDescription(new RTCSessionDescription(data.offer))
+        const answer = await rtc.createAnswer();
+        await rtc.setLocalDescription(answer);
+        sendMessage({ "answer": answer })
+
     }
     if (data.answer) {
-        console.log("收到回答 建立链接==", data.answer);
-        // 发送候选对象
-        // 设置远程描述
-        await rtc1.setRemoteDescription(new RTCSessionDescription(data.answer));
-        await rtc1.addEventListener("icecandidate", event => {
+        console.log("接收到answer", data.answer);
+        rtc.setRemoteDescription(new RTCSessionDescription(data.answer))
+        rtc.addEventListener("icecandidate", event => {
             if (event.candidate) {
-                sendMessage({ 'icecandidate': event.candidate })
+                sendMessage({ 'icecandidate': event.candidate });
             }
         })
     }
     if (data.icecandidate) {
-        // 收到候选对象
-        console.log("候选对象:", data.icecandidate);
-        await rtc2.addIceCandidate(data.icecandidate)
+        console.log("接收到icecandidate", data.icecandidate);
+        rtc.addIceCandidate(data.icecandidate)
     }
 }
 
 function sendMessage(data) {
-    let ws = webSocket
-    if (ws.readyState == WebSocket.OPEN) {
-        ws.send(JSON.stringify(data))
-    } else {
-        setTimeout(() => {
-            sendMessage(JSON.stringify(data))
-        }, 1000);
-    }
+    websocket.send(JSON.stringify(data))
 }

@@ -68,10 +68,19 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 		super.handleTransportError(session, exception);
 	}
 
+	/**
+	 * TODO:
+	 *
+	 * @description:
+	 * @author: lsh
+	 * @date: 2022-08-25 03:09
+	 * @param: [session, message]
+	 * @return: void
+	 */
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 		String id = getId(session);
-		logger.warn("message:{}",JSON.toJSONString(message.getPayload()));
+		logger.warn("message:{}", JSON.toJSONString(message));
 		ConcurrentHashMap<String, WebSocketSession> sessionPool = IceSessionManage.SESSION_POOL;
 		sessionPool.forEach((K, V) -> {
 			if (!K.equals(id)) {

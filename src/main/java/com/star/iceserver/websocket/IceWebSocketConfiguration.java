@@ -35,8 +35,11 @@ public class IceWebSocketConfiguration implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(new IceWebSocketHandler(), "/websocket") //处理器
-				.addInterceptors(webSocketInterceptor()) //拦截器
-				.setAllowedOrigins("*"); // 允许来源
+		//处理器
+		registry.addHandler(new IceWebSocketHandler(), "/websocket")
+				//拦截器
+				.addInterceptors(webSocketInterceptor())
+				// 允许来源
+				.setAllowedOrigins("*");
 	}
 }
