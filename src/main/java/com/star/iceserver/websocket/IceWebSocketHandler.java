@@ -85,7 +85,7 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 				try {
 					V.sendMessage(message);
 				} catch (IOException e) {
-					logger.warn("消息转发失败!");
+					logger.info("消息转发失败 ==> {}", e.getMessage());
 				}
 			}
 		});
