@@ -20,6 +20,7 @@ navigator.mediaDevices.getDisplayMedia({ video: { width: 1920, height: 1080, fra
 let uid = Math.floor(Math.random() * 1000) + 1
 let websocket = new WebSocket("ws://localhost:8080/websocket", [`${uid}-654321`])
 btn.onclick = getConnect
+
 // Listen for connectionstatechange on the local RTCPeerConnection
 rtc.addEventListener('connectionstatechange', event => {
     if (rtc.connectionState === 'connected') {
@@ -42,11 +43,9 @@ async function getConnect() {
         return
     }
     let offer = await rtc.createOffer()
-    rtc.setLocalDescription(offer)
+    await rtc.setLocalDescription(offer)
     sendMessage({ "offer": offer })
 }
-
-
 websocket.onopen = open
 websocket.onerror = error
 websocket.onclose = close
@@ -68,7 +67,7 @@ async function message(event) {
         if (!window.confirm("接收会话？")) {
             return
         }
-        rtc.setRemoteDescription(new RTCSessionDescription(data.offer))
+        await rtc.setRemoteDescription(new RTCSessionDescription(data.offer))
         const answer = await rtc.createAnswer();
         await rtc.setLocalDescription(answer);
         sendMessage({ "answer": answer })
@@ -76,7 +75,7 @@ async function message(event) {
     }
     if (data.answer) {
         console.log("接收到answer", data.answer);
-        rtc.setRemoteDescription(new RTCSessionDescription(data.answer))
+        await rtc.setRemoteDescription(new RTCSessionDescription(data.answer))
         rtc.addEventListener("icecandidate", event => {
             if (event.candidate) {
                 sendMessage({ 'icecandidate': event.candidate });
@@ -85,7 +84,7 @@ async function message(event) {
     }
     if (data.icecandidate) {
         console.log("接收到icecandidate", data.icecandidate);
-        rtc.addIceCandidate(data.icecandidate)
+        await rtc.addIceCandidate(data.icecandidate)
     }
 }
 

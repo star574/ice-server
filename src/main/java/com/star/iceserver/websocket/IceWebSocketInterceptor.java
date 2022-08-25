@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class IceWebSocketInterceptor extends HttpSessionHandshakeInterceptor {
 
-	private static Logger logger = LoggerFactory.getLogger(IceWebSocketInterceptor.class);
+	private static final Logger logger = LoggerFactory.getLogger(IceWebSocketInterceptor.class);
 
 	/**
 	 * TODO:
@@ -42,7 +42,8 @@ public class IceWebSocketInterceptor extends HttpSessionHandshakeInterceptor {
 		try {
 			id = token.split("-")[0];
 			auth = token.split("-")[1];
-		} catch (Exception e) {
+		} catch (Exception ignored) {
+			return false;
 		}
 		// 鉴权
 		if (!StringUtils.hasLength(auth) || !auth.equals("654321")) {

@@ -1,14 +1,9 @@
 package com.star.iceserver.websocket;
 
-import com.alibaba.fastjson2.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.socket.BinaryMessage;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -28,7 +23,7 @@ public class IceSessionManage {
 	public static void putSession(WebSocketSession session) {
 		String id = (String) session.getAttributes().get("id");
 		SESSION_POOL.put(id, session);
-		logger.warn("{}--连接成功--在线人数--{}", id, SESSION_POOL.size());
+		logger.debug("{}--连接成功--在线人数--{}", id, SESSION_POOL.size());
 	}
 
 	public static void delSession(String id) {
