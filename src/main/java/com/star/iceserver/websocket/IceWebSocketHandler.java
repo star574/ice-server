@@ -76,7 +76,7 @@ public class IceWebSocketHandler extends AbstractWebSocketHandler {
 	 * @return: void
 	 */
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message){
 		String id = getId(session);
 		logger.warn("{}:message:{}", id, JSON.toJSONString(message));
 		ConcurrentHashMap<String, WebSocketSession> sessionPool = IceSessionManage.SESSION_POOL;
